@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroPredictor Premium</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --container-bg: #1E1E2E;
+            --accent-purple: #7B61FF;
+            --accent-gold: #FFD700;
+            --text-white: #FFFFFF;
+            --text-grey: #B0B0B0;
+            --input-bg: #2d2d3d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background-color: var(--container-bg);
+            border: 1px solid var(--accent-purple);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-section {
+            flex: 1;
+        }
+
+        .sidebar {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--text-white);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--accent-purple);
+            padding-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--accent-purple);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: var(--input-bg);
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent-gold);
+            outline: none;
+        }
+
+        /* Autocomplete results */
+        .autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--input-bg);
+            border: 1px solid var(--accent-purple);
+            border-radius: 0 0 6px 6px;
+            z-index: 100;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #444;
+        }
+
+        .autocomplete-item:hover {
+            background-color: var(--accent-purple);
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-purple);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #6a0dad;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+
+        .btn-danger {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        .profile-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .profile-item {
+            background-color: var(--input-bg);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .profile-name {
+            font-weight: bold;
+            color: var(--text-white);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            background: #252535;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .category-item input {
+            width: auto;
+        }
+
+        .select-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- Main Form -->
+        <div class="card form-section">
+            <h1>AstroPredictor v2.2 (Manual Input Enabled)</h1>
+
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" placeholder="Enter Full Name" value="User">
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" value="1990-01-01">
+                </div>
+                <div style="flex: 1;">
+                    <label for="tob">Time of Birth</label>
+                    <input type="time" id="tob" value="12:00">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="pob">Place of Birth (Start typing...)</label>
+                <input type="text" id="pob" placeholder="e.g. Chennai, Mumbai, New York"
+                    onkeyup="searchLocation(this.value)" autocomplete="off">
+                <div id="autocomplete-results" class="autocomplete-results"></div>
+                <!-- Hidden inputs for Lat/Lon -->
+                <input type="hidden" id="latitude">
+                <input type="hidden" id="longitude">
+                <input type="hidden" id="timezone" value="5.5">
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 10px;">
+                <div style="flex: 2;">
+                    <label for="star">Birth Star (Nakshatra)</label>
+                    <select id="star">
+                        <option value="">Select Nakshatra</option>
+                        <option value="Ashwini">Ashwini</option>
+                        <option value="Bharani">Bharani</option>
+                        <option value="Krittika (Karthigai)">Krittika (Karthigai)</option>
+                        <option value="Rohini">Rohini</option>
+                        <option value="Mrigashirsha (Mrigasheerisham)">Mrigashirsha (Mrigasheerisham)</option>
+                        <option value="Ardra (Thiruvathirai)">Ardra (Thiruvathirai)</option>
+                        <option value="Punarvasu (Punarpoosam)">Punarvasu (Punarpoosam)</option>
+                        <option value="Pushya (Poosam)">Pushya (Poosam)</option>
+                        <option value="Ashlesha (Ayilyam)">Ashlesha (Ayilyam)</option>
+                        <option value="Magha (Magam)">Magha (Magam)</option>
+                        <option value="Purva Phalguni (Pooram)">Purva Phalguni (Pooram)</option>
+                        <option value="Uttara Phalguni (Uthiram)">Uttara Phalguni (Uthiram)</option>
+                        <option value="Hasta (Hastham)">Hasta (Hastham)</option>
+                        <option value="Chitra (Chithirai)">Chitra (Chithirai)</option>
+                        <option value="Swati (Swathi)">Swati (Swathi)</option>
+                        <option value="Vishakha (Visakam)">Vishakha (Visakam)</option>
+                        <option value="Anuradha (Anusham)">Anuradha (Anusham)</option>
+                        <option value="Jyeshtha (Kettai)">Jyeshtha (Kettai)</option>
+                        <option value="Mula (Moolam)">Mula (Moolam)</option>
+                        <option value="Purva Ashadha (Pooradam)">Purva Ashadha (Pooradam)</option>
+                        <option value="Uttara Ashadha (Uthiradam)">Uttara Ashadha (Uthiradam)</option>
+                        <option value="Shravana (Thiruvonam)">Shravana (Thiruvonam)</option>
+                        <option value="Dhanishta (Avittam)">Dhanishta (Avittam)</option>
+                        <option value="Shatabhisha (Sathayam)">Shatabhisha (Sathayam)</option>
+                        <option value="Purva Bhadrapada (Poorattathi)">Purva Bhadrapada (Poorattathi)</option>
+                        <option value="Uttara Bhadrapada (Uthirattathi)">Uttara Bhadrapada (Uthirattathi)</option>
+                        <option value="Revati (Revathi)">Revati (Revathi)</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label for="pada">Pada (Quarter)</label>
+                    <select id="pada">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Manual Dasa Entry Section -->
+            <div class="form-group" style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="manualDasaToggle" onchange="toggleManualDasa()" style="width: auto;">
+                    Enable Manual Dasa Entry (Override Calculation)
+                </label>
+            </div>
+
+            <div id="manualDasaFields"
+                style="display: none; background-color: #252535; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label for="dasaLord">Dasa Lord</label>
+                        <select id="dasaLord">
+                            <option value="Sun">Sun</option>
+                            <option value="Moon">Moon</option>
+                            <option value="Mars">Mars</option>
+                            <option value="Rahu">Rahu</option>
+                            <option value="Jupiter">Jupiter</option>
+                            <option value="Saturn">Saturn</option>
+                            <option value="Mercury">Mercury</option>
+                            <option value="Ketu">Ketu</option>
+                            <option value="Venus">Venus</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="bhuktiLord">Bhukti Lord</label>
+                        <select id="bhuktiLord">
+                            <option value="Sun">Sun</option>
+                            <option value="Moon">Moon</option>
+                            <option value="Mars">Mars</option>
+                            <option value="Rahu">Rahu</option>
+                            <option value="Jupiter">Jupiter</option>
+                            <option value="Saturn">Saturn</option>
+                            <option value="Mercury">Mercury</option>
+                            <option value="Ketu">Ketu</option>
+                            <option value="Venus">Venus</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="antaraLord">Antara Lord</label>
+                        <select id="antaraLord">
+                            <option value="Sun">Sun</option>
+                            <option value="Moon">Moon</option>
+                            <option value="Mars">Mars</option>
+                            <option value="Rahu">Rahu</option>
+                            <option value="Jupiter">Jupiter</option>
+                            <option value="Saturn">Saturn</option>
+                            <option value="Mercury">Mercury</option>
+                            <option value="Ketu">Ketu</option>
+                            <option value="Venus">Venus</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dasaEndDate">Dasa End Date</label>
+                    <input type="date" id="dasaEndDate">
+                </div>
+            </div>
+
+            <!-- Category Selection -->
+            <div id="selectionSection"
+                style="margin-top: 25px; border-top: 2px solid var(--accent-purple); padding-top: 20px;">
+                <h2 style="color: var(--accent-gold); border: none;">Select Categories for Report</h2>
+                <div class="select-actions" style="margin-bottom: 15px;">
+                    <button class="btn-secondary"
+                        style="width:auto; font-size: 0.85rem; padding: 6px 15px; margin-right: 10px;"
+                        onclick="toggleAllCategories(true)">Select All</button>
+                    <button class="btn-secondary" style="width:auto; font-size: 0.85rem; padding: 6px 15px;"
+                        onclick="toggleAllCategories(false)">Clear All</button>
+                </div>
+                <div id="categoryGrid" class="category-grid"
+                    style="min-height: 100px; border: 1px dashed #444; margin-bottom: 20px;">
+                    <!-- Categories will be injected here -->
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="generateReport()" style="font-size: 1.1rem; padding: 18px;">Generate
+                Premium Report</button>
+            <div id="status" class="status"></div>
+
+            <div style="margin-top: 20px; font-size: 0.8rem; color: #555; text-align: center;">
+                Powered by Flatlib (Running on Localhost:8086)
+            </div>
+        </div>
+
+        <!-- Sidebar: Profile Manager -->
+        <div class="sidebar">
+            <div class="card">
+                <h2>Profile Manager</h2>
+                <button class="btn-secondary" onclick="saveProfile()">Save Current Profile</button>
+                <div id="profile-list" class="profile-list">
+                    <!-- Profiles load here -->
+                    <div style="text-align: center; color: grey;">Loading...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>External Links</h2>
+                <a href="https://www.jamakkol.com/" target="_blank"
+                    style="color: var(--accent-gold); text-decoration: none;">Jamakkol.com</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "";
+
+        // --- Location Autocomplete ---
+        let debounceTimer;
+
+        async function searchLocation(query) {
+            const resultsDiv = document.getElementById('autocomplete-results');
+            if (query.length < 3) {
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+
+                    resultsDiv.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'autocomplete-item';
+                            div.textContent = item.display_name;
+                            div.onclick = () => selectLocation(item);
+                            resultsDiv.appendChild(div);
+                        });
+                        resultsDiv.style.display = 'block';
+                    } else {
+                        resultsDiv.style.display = 'none';
+                    }
+                } catch (e) {
+                    console.error("Location search failed", e);
+                }
+            }, 300);
+        }
+
+        function selectLocation(item) {
+            document.getElementById('pob').value = item.display_name;
+            document.getElementById('latitude').value = item.lat;
+            document.getElementById('longitude').value = item.lon;
+            document.getElementById('autocomplete-results').style.display = 'none';
+            // Simplified timezone approximation (should ideally come from API)
+            // Longitude * 4 minutes per degree / 60 = Hours from UTC
+            const tz = Math.round((parseFloat(item.lon) * 4 / 60) * 10) / 10;
+            document.getElementById('timezone').value = tz;
+            console.log(`Selected: ${item.display_name} (${item.lat}, ${item.lon}, TZ: ${tz})`);
+        }
+
+        // --- Core Functions ---
+
+        function toggleManualDasa() {
+            const isChecked = document.getElementById('manualDasaToggle').checked;
+            document.getElementById('manualDasaFields').style.display = isChecked ? 'block' : 'none';
+        }
+
+        function getFormData() {
+            const data = {
+                name: document.getElementById('name').value,
+                date_of_birth: document.getElementById('dob').value,
+                time_of_birth: document.getElementById('tob').value,
+                place_of_birth: document.getElementById('pob').value,
+                latitude: parseFloat(document.getElementById('latitude').value) || 0.0,
+                longitude: parseFloat(document.getElementById('longitude').value) || 0.0,
+                timezone: parseFloat(document.getElementById('timezone').value) || 5.5,
+                star: document.getElementById('star').value,
+                pada: parseInt(document.getElementById('pada').value) || 1
+            };
+
+            if (document.getElementById('manualDasaToggle').checked) {
+                data.manual_dasa = {
+                    dasa_lord: document.getElementById('dasaLord').value,
+                    bhukti_lord: document.getElementById('bhuktiLord').value,
+                    antara_lord: document.getElementById('antaraLord').value,
+                    dasa_end_date: document.getElementById('dasaEndDate').value
+                };
+            }
+            return data;
+        }
+
+        function getSelectedCategories() {
+            const checkboxes = document.querySelectorAll('#categoryGrid input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        async function generateReport() {
+            const statusDiv = document.getElementById('status');
+            const data = getFormData();
+
+            if (!data.place_of_birth || data.latitude === 0) {
+                alert("Please select a location from the dropdown list.");
+                return;
+            }
+
+            statusDiv.textContent = "Generating Real Planetary Data (Flatlib)...";
+            statusDiv.style.color = "var(--accent-gold)";
+
+            try {
+                const selectedCats = getSelectedCategories();
+
+                // 1. Prediction
+                const predResponse = await fetch(`${API_BASE}/predict/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        birth_details: data,
+                        selected_categories: selectedCats
+                    })
+                });
+
+                if (!predResponse.ok) throw new Error("Prediction API Failed");
+                const predData = await predResponse.json();
+
+                statusDiv.textContent = "Formatting PDF Report...";
+
+                // 2. PDF
+                const reportResponse = await fetch(`${API_BASE}/report/generate_pdf`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prediction_data: predData,
+                        selected_categories: selectedCats
+                    })
+                });
+
+                if (!reportResponse.ok) throw new Error("PDF Generation Failed");
+
+                const blob = await reportResponse.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Report_${data.name}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                statusDiv.textContent = "Report Downloaded Successfully!";
+                statusDiv.style.color = "#0f0";
+
+            } catch (error) {
+                console.error(error);
+                statusDiv.textContent = "Error: " + error.message;
+                statusDiv.style.color = "red";
+            }
+        }
+
+        // --- Profile Management ---
+
+        async function loadProfiles() {
+            const list = document.getElementById('profile-list');
+            try {
+                const res = await fetch(`${API_BASE}/profiles/`);
+                const profiles = await res.json();
+
+                list.innerHTML = '';
+                if (profiles.length === 0) {
+                    list.innerHTML = '<div style="text-align:center; color:gray;">No profiles saved</div>';
+                    return;
+                }
+
+                profiles.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = 'profile-item';
+
+                    div.innerHTML = `
+                        <div class="profile-name">${p.name}</div>
+                        <div>
+                            <button class="btn-secondary" style="width:auto; padding:5px 10px; margin:0;" onclick='loadProfileData(${JSON.stringify(p)})'>Load</button>
+                            <button class="btn-danger" style="width:auto; padding:5px 10px;" onclick="deleteProfile('${p.id}')">X</button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                list.textContent = "Error loading profiles";
+            }
+        }
+
+        async function saveProfile() {
+            const data = getFormData();
+            if (!data.name) return alert("Enter a name");
+
+            try {
+                // Construct profile object matching schema (Flat structure)
+                const profile = {
+                    ...data,
+                    id: crypto.randomUUID()
+                };
+
+                const res = await fetch(`${API_BASE}/profiles/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profile)
+                });
+
+                if (res.ok) {
+                    alert("Profile Saved!");
+                    loadProfiles();
+                } else {
+                    const err = await res.json();
+                    alert("Failed to save: " + JSON.stringify(err));
+                }
+            } catch (e) {
+                alert("Error saving: " + e.message);
+            }
+        }
+
+        async function deleteProfile(id) {
+            if (!confirm("Delete?")) return;
+            await fetch(`${API_BASE}/profiles/${id}`, { method: 'DELETE' });
+            loadProfiles();
+        }
+
+        function loadProfileData(p) {
+            // Profile p is now valid flat object
+            document.getElementById('name').value = p.name;
+            document.getElementById('dob').value = p.date_of_birth;
+            document.getElementById('tob').value = p.time_of_birth;
+            document.getElementById('pob').value = p.place_of_birth;
+            document.getElementById('latitude').value = p.latitude;
+            document.getElementById('longitude').value = p.longitude;
+            document.getElementById('timezone').value = p.timezone;
+            document.getElementById('star').value = p.star;
+            document.getElementById('pada').value = p.pada || 1;
+
+            // Load Manual Dasa
+            if (p.manual_dasa) {
+                document.getElementById('manualDasaToggle').checked = true;
+                toggleManualDasa(); // Show fields
+                document.getElementById('dasaLord').value = p.manual_dasa.dasa_lord || 'Sun';
+                document.getElementById('bhuktiLord').value = p.manual_dasa.bhukti_lord || 'Sun';
+                document.getElementById('antaraLord').value = p.manual_dasa.antara_lord || 'Sun';
+                document.getElementById('dasaEndDate').value = p.manual_dasa.dasa_end_date || '';
+            } else {
+                document.getElementById('manualDasaToggle').checked = false;
+                toggleManualDasa();
+            }
+        }
+
+        // --- Category UI ---
+        const ALL_CATEGORIES = [
+            'health', 'career', 'finance', 'stock_market', 'foreign_settlement',
+            'relationships', 'children', 'education', 'spirituality', 'legal',
+            'house_property', 'land_real_estate', 'vehicles', 'business_vs_job',
+            'promotion', 'luck_factor', 'job_change', 'business_start_change', 'dasa_predictions'
+        ];
+
+        function initCategories() {
+            console.log("Initializing Categories...");
+            const grid = document.getElementById('categoryGrid');
+            if (!grid) {
+                console.error("categoryGrid div not found!");
+                return;
+            }
+            grid.innerHTML = '';
+            ALL_CATEGORIES.forEach(cat => {
+                const label = cat.replace(/_/g, ' ').toUpperCase();
+                const div = document.createElement('div');
+                div.className = 'category-item';
+                div.innerHTML = `
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                        <input type="checkbox" value="${cat}" checked> ${label}
+                    </label>
+                `;
+                grid.appendChild(div);
+            });
+            console.log("Categories Initialized.");
+        }
+
+        function toggleAllCategories(checked) {
+            const checkboxes = document.querySelectorAll('#categoryGrid input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = checked);
+        }
+
+        // Init Sequence
+        document.addEventListener('DOMContentLoaded', () => {
+            initCategories();
+            loadProfiles();
+        });
+    </script>
+</body>
+
+</html>

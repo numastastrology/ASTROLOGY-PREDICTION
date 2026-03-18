@@ -1,9 +1,10 @@
 from astro_predictor_app.app.utils.astro_utils import (
     get_sign_number, get_sign_name, get_planet_sign, calculate_house, get_lord,
-    get_planet_nature, get_house_outcome, get_ordinal, get_dignity,
-    analyze_planetary_aspects, analyze_transits, analyze_jamakkol, analyze_dasa_bhukti_detailed
+    get_planet_nature, get_house_outcome, get_ordinal, get_dignity, get_nak_info,
+    analyze_planetary_combinations, analyze_planetary_aspects, analyze_transits, analyze_jamakkol, analyze_dasa_bhukti_detailed
 )
 from astro_predictor_app.app.utils.remedy_utils import get_general_remedies, get_dasa_remedies
+from astro_predictor_app.app.utils.description_utils import LAGNA_HOUSE_INDICATORS, PADA_TRAITS
 
 def analyze(birth_details, chart_data, dasa_info=None):
     points = []
@@ -12,36 +13,47 @@ def analyze(birth_details, chart_data, dasa_info=None):
     transit_pos = chart_data.get('transit_positions', {})
     jamakkol_data = chart_data.get('jamakkol', {})
     
-    # Target Houses for Education: 4 (Primary), 5 (Intelligence), 9 (Higher Studies)
-    target_houses = [4, 5, 9]
+    # Get Nakshatra/Pada for Moon
+    moon_pos = planetary_pos.get('Moon', '')
+    nak_info = get_nak_info(moon_pos)
+    nakshatra = nak_info['name'] if nak_info else 'Unknown'
+    pada = str(nak_info['pada']) if nak_info else 'Unknown'
     
-    base_score = 60
+    # Target Houses for Education: 4 (Early), 2 (Academic), 5 (Intelligence), 9 (Higher)
+    target_houses = [4, 2, 5, 9]
+    
+    base_score = 65
     
     # 1. Foundation
     h4_sign = get_sign_name((get_sign_number(asc_sign) + 4 - 1) % 12 or 12)
     h4_lord = get_lord(h4_sign)
-    points.append(f"<b>Academic Foundation:</b> Your educational path is influenced by **{h4_sign}** energy, governed by **{h4_lord}**.")
+    points.append(f"<b>Educational Foundation:</b> Your learning path is influenced by <b>{h4_sign}</b> energy, governed by <b>{h4_lord}</b> influences.")
 
-    # 2. Key Significator (Mercury for Intellect/Education)
+    if asc_sign in LAGNA_HOUSE_INDICATORS:
+        indicators = LAGNA_HOUSE_INDICATORS[asc_sign].get("Education", [])
+        points.extend(indicators)
+
+    # 2. Key Significator (Mercury for Intellect)
     mercury_pos = planetary_pos.get('Mercury', '')
     m_sign = get_planet_sign(mercury_pos)
     m_house = calculate_house(m_sign, asc_sign)
     m_dignity = get_dignity('Mercury', m_sign)
-    points.append(f"<b>Primary Significator:</b> Mercury (planet of intellect) is in the {get_ordinal(m_house)} house in **{m_sign}**.")
-    points.append(f"<b>Learning Style:</b> Mercury triggers **{get_house_outcome(m_house, type='pos' if m_dignity != 'Debilitated' else 'neg')}** in your academic pursuits.")
+    points.append(f"<b>Intellectual Significator:</b> Mercury is in the {get_ordinal(m_house)} house in <b>{m_sign}</b>.")
+    points.append(f"<b>Cognitive Ability:</b> Mercury triggers <b>{get_house_outcome(m_house, type='pos' if m_dignity != 'Debilitated' else 'neg', category='Education')}</b> in your learning journey.")
 
     if m_dignity == 'Debilitated':
         base_score -= 10
-        points.append("<b>Challenge:</b> Mercury is restricted, suggesting that focus and methodical study are key to overcoming hurdles.")
+        points.append("<b>Challenge:</b> Mercury is restricted, implying that consistent effort is needed for academic clarity.")
     elif m_dignity == 'Exalted':
         base_score += 10
-        points.append("<b>Strength:</b> Mercury is powerful, providing sharp analytical skills and academic success.")
+        points.append("<b>Strength:</b> Mercury is powerful, providing sharp analytical and learning capabilities.")
 
     # 3. House-by-House Impacts
     area_map = {
-        4: "Primary Knowledge",
-        5: "Specialized Intelligence",
-        9: "Higher Learning"
+        4: "Personal Learning",
+        2: "Academic Speech",
+        5: "Specialization",
+        9: "Higher Research"
     }
     
     for house_num, area in area_map.items():
@@ -51,47 +63,60 @@ def analyze(birth_details, chart_data, dasa_info=None):
              p_sign = get_planet_sign(pos_str)
              p_house = calculate_house(p_sign, asc_sign)
              if p_house == house_num:
-                 nature = get_planet_nature(planet)
-                 outcome = get_house_outcome(house_num, type='pos' if planet in ['Jupiter', 'Mercury', 'Venus'] else 'neg')
-                 points.append(f"<b>{area}:</b> {planet}'s presence brings **{nature}** here, triggering **{outcome}**.")
-                 if planet in ['Saturn', 'Mars', 'Rahu', 'Ketu']: base_score -= 10
-                 found = True
+                  nature = get_planet_nature(planet)
+                  outcome = get_house_outcome(house_num, type='pos' if planet in ['Mercury', 'Jupiter', 'Venus'] else 'neg', category='Education')
+                  points.append(f"<b>{area}:</b> {planet}'s presence brings <b>{nature}</b> here, triggering <b>{outcome}</b>.")
+                  if planet in ['Saturn', 'Rahu', 'Ketu']: base_score -= 5
+                  found = True
         if not found:
-             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers **{get_house_outcome(house_num)}**.")
+             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers <b>{get_house_outcome(house_num, category='Education')}</b>.")
 
-    # 4. Strengths & Challenges Summary
-    challenges = []
-    stability = []
-    for planet in ['Mercury', 'Jupiter', h4_lord]:
-        p_pos = planetary_pos.get(planet, '')
-        p_sign = get_planet_sign(p_pos)
-        dig = get_dignity(planet, p_sign)
-        if dig == 'Debilitated' or calculate_house(p_sign, asc_sign) in [6, 8, 12]:
-            challenges.append(planet)
-        elif dig == 'Exalted' or get_lord(p_sign) == planet:
-            stability.append(planet)
-
-    if challenges:
-        points.append(f"<b>Challenges:</b> **{', '.join(challenges)}** show some academic restrictions, requiring consistent concentration.")
-    if stability:
-        points.append(f"<b>Stability:</b> **{', '.join(stability)}** are well-placed, supporting steady educational milestones.")
-
-    # 5. Kendra Action Potential
+    # 4. Kendra Action Potential
     kendras = [p for p, pos in planetary_pos.items() if calculate_house(get_planet_sign(pos), asc_sign) in [1, 4, 7, 10] and p != 'Mandhi']
     if kendras:
-        points.append(f"<b>Active Influences:</b> **{', '.join(kendras)}** are in central houses, actively driving your educational decisions.")
+        points.append(f"<b>Active Influences:</b> <b>{', '.join(kendras)}</b> are in central houses, actively impacting your educational focus.")
 
-    # 6. Strategic Advice
-    advice = "Maintain a disciplined study schedule and focus on foundational concepts before moving to advanced topics."
-    if base_score < 50:
-        advice = "Seek guidance from mentors and avoid distractions during crucial examination periods."
+    # 5. Strategic Advice
+    advice = "Focus on conceptual clarity and maintain a disciplined study routine for consistent academic success."
+    if base_score < 55:
+        advice = "Prioritize logical understanding over rote memorization during this phase."
     points.append(f"<b>Strategic Recommendation:</b> {advice}")
 
     # Standardized Logic
-    points.extend(analyze_planetary_aspects(planetary_pos, asc_sign, target_houses))
-    points.extend(analyze_transits(transit_pos, asc_sign, target_houses))
-    points.extend(analyze_jamakkol(jamakkol_data, asc_sign, target_houses))
+    points.extend(analyze_planetary_combinations(planetary_pos, asc_sign, target_houses, category='Education'))
+    points.extend(analyze_planetary_aspects(planetary_pos, asc_sign, target_houses, category='Education'))
+    points.extend(analyze_transits(transit_pos, asc_sign, target_houses, category='Education'))
+    points.extend(analyze_jamakkol(jamakkol_data, asc_sign, target_houses, category='Education'))
     points.extend(analyze_dasa_bhukti_detailed(dasa_info, {}, category_name="Education"))
+
+    # --- Dynamic Education Synthesis ---
+    from astro_predictor_app.app.utils.astro_utils import get_dynamic_recommendations
+    dynamic_insights = get_dynamic_recommendations(planetary_pos, asc_sign, 'Education')
+
+    points.append("<b>Top Recommended Study Paths:</b>")
+    
+    lagna_recs = []
+    if asc_sign in LAGNA_HOUSE_INDICATORS:
+        lhi = LAGNA_HOUSE_INDICATORS[asc_sign]
+        lagna_recs = lhi.get("Top_Study_Recommendations", [])
+
+    # Priority 0: Nakshatra Pada Recommendation
+    pada_rec = ""
+    if nakshatra in PADA_TRAITS and pada in PADA_TRAITS[nakshatra]:
+        pada_rec = PADA_TRAITS[nakshatra][pada].get('Education', '')
+
+    # Combine and limit to exactly 5 (as requested by user)
+    raw_combined = ([pada_rec] if pada_rec else []) + dynamic_insights + lagna_recs
+    final_recs = []
+    seen = set()
+    for r in raw_combined:
+        if r and r not in seen:
+            final_recs.append(r)
+            seen.add(r)
+            if len(final_recs) >= 5: break
+
+    for rec in final_recs:
+        points.append(f"• {rec}")
 
     # Remedies Integration
     remedies = get_general_remedies("education")

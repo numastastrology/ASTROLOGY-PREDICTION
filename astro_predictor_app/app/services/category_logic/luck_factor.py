@@ -20,15 +20,15 @@ def analyze(birth_details, chart_data, dasa_info=None):
     # 1. Foundation
     h9_sign = get_sign_name((get_sign_number(asc_sign) + 9 - 1) % 12 or 12)
     h9_lord = get_lord(h9_sign)
-    points.append(f"<b>Fortune Foundation:</b> Your natural luck quotient is influenced by **{h9_sign}** energy, governed by **{h9_lord}**.")
+    points.append(f"<b>Fortune Foundation:</b> Your natural luck quotient is influenced by <b>{h9_sign}</b> energy, governed by <b>{h9_lord}</b>.")
 
     # 2. Key Significator (Jupiter for Fortune)
     jupiter_pos = planetary_pos.get('Jupiter', '')
     j_sign = get_planet_sign(jupiter_pos)
     j_house = calculate_house(j_sign, asc_sign)
     j_dignity = get_dignity('Jupiter', j_sign)
-    points.append(f"<b>Luck Significator:</b> Jupiter (planet of fortune) is in the {get_ordinal(j_house)} house in **{j_sign}**.")
-    points.append(f"<b>Opportunity Flow:</b> Jupiter triggers **{get_house_outcome(j_house, type='pos' if j_dignity != 'Debilitated' else 'neg')}** in your path.")
+    points.append(f"<b>Luck Significator:</b> Jupiter (planet of fortune) is in the {get_ordinal(j_house)} house in <b>{j_sign}</b>.")
+    points.append(f"<b>Opportunity Flow:</b> Jupiter triggers <b>{get_house_outcome(j_house, type='pos' if j_dignity != 'Debilitated' else 'neg')}</b> in your path.")
 
     if j_dignity == 'Debilitated':
         base_score -= 10
@@ -53,11 +53,11 @@ def analyze(birth_details, chart_data, dasa_info=None):
              if p_house == house_num:
                  nature = get_planet_nature(planet)
                  outcome = get_house_outcome(house_num, type='pos' if planet in ['Jupiter', 'Venus', 'Moon'] else 'neg')
-                 points.append(f"<b>{area}:</b> {planet}'s presence brings **{nature}** here, triggering **{outcome}**.")
+                 points.append(f"<b>{area}:</b> {planet}'s presence brings <b>{nature}</b> here, triggering <b>{outcome}</b>.")
                  if planet in ['Saturn', 'Mars', 'Rahu', 'Ketu']: base_score -= 10
                  found = True
         if not found:
-             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers **{get_house_outcome(house_num)}**.")
+             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers <b>{get_house_outcome(house_num)}</b>.")
 
     # 4. Strengths & Challenges Summary
     challenges = []
@@ -73,14 +73,14 @@ def analyze(birth_details, chart_data, dasa_info=None):
             stability.append(planet)
 
     if challenges:
-        points.append(f"<b>Challenges:</b> **{', '.join(challenges)}** show some fortune hurdles, requiring patience in transitions.")
+        points.append(f"<b>Challenges:</b> <b>{', '.join(challenges)}</b> show some fortune hurdles, requiring patience in transitions.")
     if stability:
-        points.append(f"<b>Stability:</b> **{', '.join(stability)}** are well-placed, providing a protective and favorable luck factor.")
+        points.append(f"<b>Stability:</b> <b>{', '.join(stability)}</b> are well-placed, providing a protective and favorable luck factor.")
 
     # 5. Kendra Action Potential
     kendras = [p for p, pos in planetary_pos.items() if calculate_house(get_planet_sign(pos), asc_sign) in [1, 4, 7, 10] and p != 'Mandhi']
     if kendras:
-        points.append(f"<b>Active Influences:</b> **{', '.join(kendras)}** are in central houses, actively driving your fortunate moments.")
+        points.append(f"<b>Active Influences:</b> <b>{', '.join(kendras)}</b> are in central houses, actively driving your fortunate moments.")
 
     # 6. Strategic Advice
     advice = "Stay optimistic and recognize opportunities early to make the most of your natural fortune."

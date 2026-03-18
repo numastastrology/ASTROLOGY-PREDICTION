@@ -12,37 +12,33 @@ def analyze(birth_details, chart_data, dasa_info=None):
     transit_pos = chart_data.get('transit_positions', {})
     jamakkol_data = chart_data.get('jamakkol', {})
     
-    # Target Houses for Stock: 5 (Speculation), 11 (Gains), 2 (Wealth), 9 (Fortune)
-    target_houses = [5, 11, 2, 9]
+    # Target Houses for Stock Market: 5 (Speculation), 11 (Gains), 2 (Wealth), 8 (Sudden Gains)
+    target_houses = [5, 11, 2, 8]
     
-    base_score = 60
+    base_score = 55
     
     # 1. Foundation
     h5_sign = get_sign_name((get_sign_number(asc_sign) + 5 - 1) % 12 or 12)
     h5_lord = get_lord(h5_sign)
-    points.append(f"<b>Speculative Foundation:</b> Your stock market and speculation path is influenced by **{h5_sign}** energy, governed by **{h5_lord}**.")
+    points.append(f"<b>Speculative Foundation:</b> Your stock market and speculation path is influenced by <b>{h5_sign}</b> energy, governed by <b>{h5_lord}</b> influences.")
 
-    # 2. Key Significator (Mercury for Calculation/Rahu for sudden gains)
+    # 2. Key Significators (Mercury for Logic/Trade, Rahu for Speculation)
     mercury_pos = planetary_pos.get('Mercury', '')
     m_sign = get_planet_sign(mercury_pos)
     m_house = calculate_house(m_sign, asc_sign)
-    m_dignity = get_dignity('Mercury', m_sign)
-    points.append(f"<b>Primary Significator:</b> Mercury (planet of calculation) is in the {get_ordinal(m_house)} house in **{m_sign}**.")
-    points.append(f"<b>Analytical Instinct:</b> Mercury triggers **{get_house_outcome(m_house, type='pos' if m_dignity != 'Debilitated' else 'neg')}** in your speculative decisions.")
+    points.append(f"<b>Trading Significator:</b> Mercury (logic/trade) is in the {get_ordinal(m_house)} house in <b>{m_sign}</b>.")
 
-    if m_dignity == 'Debilitated':
-        base_score -= 10
-        points.append("<b>Challenge:</b> Mercury is restricted, suggesting that impulsive decisions might lead to speculative hurdles.")
-    elif m_dignity == 'Exalted':
-        base_score += 10
-        points.append("<b>Strength:</b> Mercury is powerful, providing sharp market timing and calculative success.")
+    rahu_pos = planetary_pos.get('Rahu', '')
+    r_house = calculate_house(get_planet_sign(rahu_pos), asc_sign)
+    if r_house in [5, 8, 11]:
+         points.append(f"<b>Speculative Trigger:</b> Rahu in the {get_ordinal(r_house)} house triggers high-risk, high-reward potential.")
+         base_score += 10
 
     # 3. House-by-House Impacts
     area_map = {
-        5: "Speculative Wisdom",
+        5: "Speculation Potential",
         11: "Market Gains",
-        2: "Wealth Accumulation",
-        9: "Investment Luck"
+        8: "Sudden Fluctuations"
     }
     
     for house_num, area in area_map.items():
@@ -52,51 +48,48 @@ def analyze(birth_details, chart_data, dasa_info=None):
              p_sign = get_planet_sign(pos_str)
              p_house = calculate_house(p_sign, asc_sign)
              if p_house == house_num:
-                 nature = get_planet_nature(planet)
-                 outcome = get_house_outcome(house_num, type='pos' if planet in ['Jupiter', 'Venus', 'Mercury', 'Rahu'] else 'neg')
-                 points.append(f"<b>{area}:</b> {planet}'s presence brings **{nature}** here, triggering **{outcome}**.")
-                 if planet in ['Saturn', 'Mars', 'Ketu']: base_score -= 10
-                 found = True
+                  nature = get_planet_nature(planet)
+                  outcome = get_house_outcome(house_num, type='pos' if planet in ['Mercury', 'Jupiter', 'Rahu'] else 'neg', category='Finance')
+                  points.append(f"<b>{area}:</b> {planet}'s presence brings <b>{nature}</b> here, triggering <b>{outcome}</b>.")
+                  found = True
         if not found:
-             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers **{get_house_outcome(house_num)}**.")
+             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers <b>{get_house_outcome(house_num, category='Finance')}</b>.")
 
-    # 4. Strengths & Challenges Summary
-    challenges = []
-    stability = []
-    for planet in ['Mercury', 'Jupiter', h5_lord]:
-        p_pos = planetary_pos.get(planet, '')
-        if not p_pos: continue
-        p_sign = get_planet_sign(p_pos)
-        dig = get_dignity(planet, p_sign)
-        if dig == 'Debilitated' or calculate_house(p_sign, asc_sign) in [6, 8, 12]:
-            challenges.append(planet)
-        elif dig == 'Exalted' or get_lord(p_sign) == planet:
-            stability.append(planet)
-
-    if challenges:
-        points.append(f"<b>Challenges:</b> **{', '.join(challenges)}** show some speculative hurdles, requiring cautious timing.")
-    if stability:
-        points.append(f"<b>Stability:</b> **{', '.join(stability)}** are well-placed, supporting steady and favorable investment growth.")
-
-    # 5. Kendra Action Potential
-    kendras = [p for p, pos in planetary_pos.items() if calculate_house(get_planet_sign(pos), asc_sign) in [1, 4, 7, 10] and p != 'Mandhi']
-    if kendras:
-        points.append(f"<b>Active Influences:</b> **{', '.join(kendras)}** are in central houses, actively driving your market choices.")
-
-    # 6. Strategic Advice
-    advice = "Maintain a long-term investment perspective and avoid emotional market decisions."
+    # 4. Strategic Advice
+    advice = "Focus on long-term investments rather than intra-day trading for better stability."
     if base_score < 50:
-        advice = "Exercise extreme caution in speculation and wait for more stable planetary configurations."
+        advice = "Avoid major market exposure during this volatile planetary phase."
+    
+    # --- Dynamic Stock Synthesis ---
+    from astro_predictor_app.app.utils.astro_utils import get_dynamic_recommendations
+    dynamic_insights = get_dynamic_recommendations(planetary_pos, asc_sign, 'Finance')
+
+    points.append("<b>Top Recommended Market Strategies:</b>")
+    
+    lagna_recs = ["Long-term Equity Focus", "Blue-chip Stocks", "Sectoral Funds"]
+    # Combine and limit
+    combined_recs = dynamic_insights + lagna_recs
+    final_recs = []
+    seen = set()
+    for r in combined_recs:
+        if r and r not in seen:
+            final_recs.append(r)
+            seen.add(r)
+            if len(final_recs) >= 5: break
+
+    for rec in final_recs:
+        points.append(f"• {rec}")
+
     points.append(f"<b>Strategic Recommendation:</b> {advice}")
 
     # Standardized Logic
-    points.extend(analyze_planetary_aspects(planetary_pos, asc_sign, target_houses))
-    points.extend(analyze_transits(transit_pos, asc_sign, target_houses))
-    points.extend(analyze_jamakkol(jamakkol_data, asc_sign, target_houses))
+    points.extend(analyze_planetary_aspects(planetary_pos, asc_sign, target_houses, category='Finance'))
+    points.extend(analyze_transits(transit_pos, asc_sign, target_houses, category='Finance'))
+    points.extend(analyze_jamakkol(jamakkol_data, asc_sign, target_houses, category='Finance'))
     points.extend(analyze_dasa_bhukti_detailed(dasa_info, {}, category_name="Stock Market"))
 
     # Remedies Integration
-    remedies = get_general_remedies("stock_market")
+    remedies = get_general_remedies("finance")
     if dasa_info:
         remedies.extend(get_dasa_remedies(dasa_info.get('dasa', {}).get('lord')))
 

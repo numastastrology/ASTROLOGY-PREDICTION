@@ -28,15 +28,15 @@ def analyze(birth_details, chart_data, dasa_info=None):
     d_dignity = get_dignity(d_lord, d_sign)
     
     points.append(f"<b>1. Main Period Lordship:</b> {d_lord} rules your {', '.join([get_ordinal(h) for h in d_ruled])} houses, focusing your destiny on these areas.")
-    points.append(f"<b>2. Main Period Nature:</b> {d_lord} is active, bringing **{d_nature}** to the forefront of your long-term life trajectory.")
-    points.append(f"<b>3. House Impact:</b> Positioned in the {get_ordinal(d_house)} house, it triggers **{get_house_outcome(d_house, type='pos' if d_dignity != 'Debilitated' else 'neg')}**.")
-    points.append(f"<b>4. Global Influence:</b> This major cycle defines your identity and social standing through **{get_house_description(d_house)}**.")
+    points.append(f"<b>2. Main Period Nature:</b> {d_lord} is active, bringing <b>{d_nature}</b> to the forefront of your long-term life trajectory.")
+    points.append(f"<b>3. House Impact:</b> Positioned in the {get_ordinal(d_house)} house, it triggers <b>{get_house_outcome(d_house, type='pos' if d_dignity != 'Debilitated' else 'neg')}</b>.")
+    points.append(f"<b>4. Global Influence:</b> This major cycle defines your identity and social standing through <b>{get_house_description(d_house)}</b>.")
     
     # Aspects of Mahadasa Lord (3 points)
     d_aspects = get_aspects(d_lord, d_sign, asc_sign)
     for i, ah in enumerate(d_aspects[:3]):
         outcome = get_house_outcome(ah, type='pos' if d_lord in ['Jupiter', 'Venus', 'Mercury', 'Moon'] else 'neg')
-        points.append(f"<b>5.{i+1} Aspect Influence:</b> {d_lord}'s gaze on the {get_ordinal(ah)} house drives **{outcome}**.")
+        points.append(f"<b>5.{i+1} Aspect Influence:</b> {d_lord}'s gaze on the {get_ordinal(ah)} house drives <b>{outcome}</b>.")
 
     # --- Bhukti Lord Analysis (Approx 5 points) ---
     b_sign = get_planet_sign(planetary_pos.get(b_lord, ''))
@@ -46,32 +46,32 @@ def analyze(birth_details, chart_data, dasa_info=None):
     b_dignity = get_dignity(b_lord, b_sign)
     
     points.append(f"<b>6. Sub-Period Lordship:</b> {b_lord} governs the {', '.join([get_ordinal(h) for h in b_ruled])} houses, activating these specific life sectors now.")
-    points.append(f"<b>7. Sub-Period Nature:</b> Expect **{b_nature}** to manifest intensely in your daily decisions and current mood.")
-    points.append(f"<b>8. Sub-Period House:</b> {b_lord} in the {get_ordinal(b_house)} house triggers **{get_house_outcome(b_house, type='pos' if b_dignity != 'Debilitated' else 'neg')}**.")
-    points.append(f"<b>9. Current Mood:</b> Your inner focus is currently shifting toward **{get_house_description(b_house)}**.")
+    points.append(f"<b>7. Sub-Period Nature:</b> Expect <b>{b_nature}</b> to manifest intensely in your daily decisions and current mood.")
+    points.append(f"<b>8. Sub-Period House:</b> {b_lord} in the {get_ordinal(b_house)} house triggers <b>{get_house_outcome(b_house, type='pos' if b_dignity != 'Debilitated' else 'neg')}</b>.")
+    points.append(f"<b>9. Current Mood:</b> Your inner focus is currently shifting toward <b>{get_house_description(b_house)}</b>.")
 
     # Aspects of Bhukti Lord (3 points)
     b_aspects = get_aspects(b_lord, b_sign, asc_sign)
     for i, ah in enumerate(b_aspects[:3]):
         outcome = get_house_outcome(ah, type='pos' if b_lord in ['Jupiter', 'Venus'] else 'neg')
-        points.append(f"<b>10.{i+1} Current Phase Effect:</b> {b_lord}'s impact on your {get_ordinal(ah)} house triggers **{outcome}**.")
+        points.append(f"<b>10.{i+1} Current Phase Effect:</b> {b_lord}'s impact on your {get_ordinal(ah)} house triggers <b>{outcome}</b>.")
 
     # --- Dasa-Bhukti Relationship (1 point) ---
     rel = get_relationship(d_lord, b_lord)
-    points.append(f"<b>11. Period Harmony:</b> The relationship between your Major and Sub lords is **{rel}**, indicating how smoothly these energies blend.")
+    points.append(f"<b>11. Period Harmony:</b> The relationship between your Major and Sub lords is <b>{rel}</b>, indicating how smoothly these energies blend.")
 
     # --- Life Area Specifics (4 points) ---
-    points.append(f"<b>12. Career Impact:</b> The current planetary mix emphasizes **{get_house_outcome(10, type='pos' if 'Jupiter' in [d_lord, b_lord] else 'neg')}** at work.")
-    points.append(f"<b>13. Financial Impact:</b> Wealth potential is currently defined by **{get_house_outcome(2, type='pos' if 'Venus' in [d_lord, b_lord] or 'Jupiter' in [d_lord, b_lord] else 'neg')}**.")
-    points.append(f"<b>14. Health Impact:</b> Physical vitality is influenced by **{get_house_outcome(1, type='pos' if 'Sun' in [d_lord, b_lord] else 'neg')}**.")
-    points.append(f"<b>15. Relationship Impact:</b> Interaction with others is governed by **{get_house_outcome(7, type='pos' if 'Venus' in [d_lord, b_lord] else 'neg')}**.")
+    points.append(f"<b>12. Career Impact:</b> The current planetary mix emphasizes <b>{get_house_outcome(10, type='pos' if 'Jupiter' in [d_lord, b_lord] else 'neg')}</b> at work.")
+    points.append(f"<b>13. Financial Impact:</b> Wealth potential is currently defined by <b>{get_house_outcome(2, type='pos' if 'Venus' in [d_lord, b_lord] or 'Jupiter' in [d_lord, b_lord] else 'neg')}</b>.")
+    points.append(f"<b>14. Health Impact:</b> Physical vitality is influenced by <b>{get_house_outcome(1, type='pos' if 'Sun' in [d_lord, b_lord] else 'neg')}</b>.")
+    points.append(f"<b>15. Relationship Impact:</b> Interaction with others is governed by <b>{get_house_outcome(7, type='pos' if 'Venus' in [d_lord, b_lord] else 'neg')}</b>.")
 
     # --- Antara Lord brief (2 points) ---
     if a_lord:
         a_sign = get_planet_sign(planetary_pos.get(a_lord, ''))
         a_house = calculate_house(a_sign, asc_sign)
-        points.append(f"<b>16. Immediate Focus:</b> The minor cycle of {a_lord} in the {get_ordinal(a_house)} house emphasizes **{get_house_outcome(a_house)}**.")
-        points.append(f"<b>17. Mental State:</b> {a_lord}'s nature of **{get_planet_nature(a_lord)}** is currently influencing your fleeting thoughts.")
+        points.append(f"<b>16. Immediate Focus:</b> The minor cycle of {a_lord} in the {get_ordinal(a_house)} house emphasizes <b>{get_house_outcome(a_house)}</b>.")
+        points.append(f"<b>17. Mental State:</b> {a_lord}'s nature of <b>{get_planet_nature(a_lord)}</b> is currently influencing your fleeting thoughts.")
 
     # --- Strategic Recommendations (3 points) ---
     if b_lord in ['Saturn', 'Rahu', 'Ketu']:
@@ -83,7 +83,7 @@ def analyze(birth_details, chart_data, dasa_info=None):
     
     points.append(f"<b>18. Primary Action:</b> {r1}")
     points.append(f"<b>19. Mindset Shift:</b> {r2}")
-    points.append(f"<b>20. Final Guidance:</b> Align your daily routine with {b_lord}'s preferred energy of **{get_planet_nature(b_lord)}**.")
+    points.append(f"<b>20. Final Guidance:</b> Align your daily routine with {b_lord}'s preferred energy of <b>{get_planet_nature(b_lord)}</b>.")
 
     # --- Scoring ---
     score = 60

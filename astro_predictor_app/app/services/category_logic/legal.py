@@ -20,15 +20,15 @@ def analyze(birth_details, chart_data, dasa_info=None):
     # 1. Foundation
     h6_sign = get_sign_name((get_sign_number(asc_sign) + 6 - 1) % 12 or 12)
     h6_lord = get_lord(h6_sign)
-    points.append(f"<b>Legal Dynamics Foundation:</b> Your legal and dispute resolution path is influenced by **{h6_sign}** energy, governed by **{h6_lord}**.")
+    points.append(f"<b>Legal Dynamics Foundation:</b> Your legal and dispute resolution path is influenced by <b>{h6_sign}</b> energy, governed by <b>{h6_lord}</b> influences.")
 
     # 2. Key Significator (Jupiter for Law/Justice)
     jupiter_pos = planetary_pos.get('Jupiter', '')
     j_sign = get_planet_sign(jupiter_pos)
     j_house = calculate_house(j_sign, asc_sign)
     j_dignity = get_dignity('Jupiter', j_sign)
-    points.append(f"<b>Justice Significator:</b> Jupiter (planet of justice) is in the {get_ordinal(j_house)} house in **{j_sign}**.")
-    points.append(f"<b>Judicial Outcome:</b> Jupiter triggers **{get_house_outcome(j_house, type='pos' if j_dignity != 'Debilitated' else 'neg')}** in your legal matters.")
+    points.append(f"<b>Justice Significator:</b> Jupiter is in the {get_ordinal(j_house)} house in <b>{j_sign}</b>.")
+    points.append(f"<b>Judicial Outcome:</b> Jupiter triggers <b>{get_house_outcome(j_house, type='pos' if j_dignity != 'Debilitated' else 'neg', category='Legal')}</b> in your legal matters.")
 
     if j_dignity == 'Debilitated':
         base_score -= 10
@@ -51,13 +51,13 @@ def analyze(birth_details, chart_data, dasa_info=None):
              p_sign = get_planet_sign(pos_str)
              p_house = calculate_house(p_sign, asc_sign)
              if p_house == house_num:
-                 nature = get_planet_nature(planet)
-                 outcome = get_house_outcome(house_num, type='pos' if planet in ['Jupiter', 'Venus', 'Mercury'] else 'neg')
-                 points.append(f"<b>{area}:</b> {planet}'s presence brings **{nature}** here, triggering **{outcome}**.")
-                 if planet in ['Saturn', 'Mars', 'Rahu', 'Ketu']: base_score -= 10
-                 found = True
+                  nature = get_planet_nature(planet)
+                  outcome = get_house_outcome(house_num, type='pos' if planet in ['Jupiter', 'Venus', 'Mercury'] else 'neg', category='Legal')
+                  points.append(f"<b>{area}:</b> {planet}'s presence brings <b>{nature}</b> here, triggering <b>{outcome}</b>.")
+                  if planet in ['Saturn', 'Mars', 'Rahu', 'Ketu']: base_score -= 10
+                  found = True
         if not found:
-             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers **{get_house_outcome(house_num)}**.")
+             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers <b>{get_house_outcome(house_num, category='Legal')}</b>.")
 
     # 4. Strengths & Challenges Summary
     challenges = []
@@ -73,25 +73,46 @@ def analyze(birth_details, chart_data, dasa_info=None):
             stability.append(planet)
 
     if challenges:
-        points.append(f"<b>Challenges:</b> **{', '.join(challenges)}** show some legal hurdles, necessitating expert counsel.")
+        points.append(f"<b>Challenges:</b> <b>{', '.join(challenges)}</b> show some legal hurdles, necessitating expert counsel.")
     if stability:
-        points.append(f"<b>Stability:</b> **{', '.join(stability)}** are well-placed, supporting favorable legal outcomes.")
+        points.append(f"<b>Stability:</b> <b>{', '.join(stability)}</b> are well-placed, supporting favorable legal outcomes.")
 
     # 5. Kendra Action Potential
     kendras = [p for p, pos in planetary_pos.items() if calculate_house(get_planet_sign(pos), asc_sign) in [1, 4, 7, 10] and p != 'Mandhi']
     if kendras:
-        points.append(f"<b>Active Influences:</b> **{', '.join(kendras)}** are in central houses, actively driving your legal choices.")
+        points.append(f"<b>Active Influences:</b> <b>{', '.join(kendras)}</b> are in central houses, actively driving your legal choices.")
 
     # 6. Strategic Advice
     advice = "Maintain transparent records and seek professional legal advice early in any dispute."
     if base_score < 50:
         advice = "Aim for out-of-court settlements if possible during this challenging planetary phase."
+    
+    # --- Dynamic Legal Synthesis ---
+    from astro_predictor_app.app.utils.astro_utils import get_dynamic_recommendations
+    dynamic_insights = get_dynamic_recommendations(planetary_pos, asc_sign, 'Legal')
+
+    points.append("<b>Key Legal & Resolution Insights:</b>")
+    
+    lagna_recs = []
+    # Combine and limit
+    combined_recs = dynamic_insights + lagna_recs
+    final_recs = []
+    seen = set()
+    for r in combined_recs:
+        if r and r not in seen:
+            final_recs.append(r)
+            seen.add(r)
+            if len(final_recs) >= 5: break
+
+    for rec in final_recs:
+        points.append(f"• {rec}")
+
     points.append(f"<b>Strategic Recommendation:</b> {advice}")
 
     # Standardized Logic
-    points.extend(analyze_planetary_aspects(planetary_pos, asc_sign, target_houses))
-    points.extend(analyze_transits(transit_pos, asc_sign, target_houses))
-    points.extend(analyze_jamakkol(jamakkol_data, asc_sign, target_houses))
+    points.extend(analyze_planetary_aspects(planetary_pos, asc_sign, target_houses, category='Legal'))
+    points.extend(analyze_transits(transit_pos, asc_sign, target_houses, category='Legal'))
+    points.extend(analyze_jamakkol(jamakkol_data, asc_sign, target_houses, category='Legal'))
     points.extend(analyze_dasa_bhukti_detailed(dasa_info, {}, category_name="Legal Matters"))
 
     # Remedies Integration

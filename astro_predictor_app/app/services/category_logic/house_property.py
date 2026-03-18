@@ -20,15 +20,15 @@ def analyze(birth_details, chart_data, dasa_info=None):
     # 1. Foundation
     h4_sign = get_sign_name((get_sign_number(asc_sign) + 4 - 1) % 12 or 12)
     h4_lord = get_lord(h4_sign)
-    points.append(f"<b>Inherent Assets Foundation:</b> Your property path is influenced by **{h4_sign}** energy, governed by **{h4_lord}**.")
+    points.append(f"<b>Inherent Assets Foundation:</b> Your property path is influenced by <b>{h4_sign}</b> energy, governed by <b>{h4_lord}</b> influences.")
 
     # 2. Key Significator (Mars for Property/Land)
     mars_pos = planetary_pos.get('Mars', '')
     ma_sign = get_planet_sign(mars_pos)
     ma_house = calculate_house(ma_sign, asc_sign)
     ma_dignity = get_dignity('Mars', ma_sign)
-    points.append(f"<b>Property Significator:</b> Mars (planet of land) is in the {get_ordinal(ma_house)} house in **{ma_sign}**.")
-    points.append(f"<b>Asset Accumulation:</b> Mars triggers **{get_house_outcome(ma_house, type='pos' if ma_dignity != 'Debilitated' else 'neg')}** in your property matters.")
+    points.append(f"<b>Property Significator:</b> Mars (planet of land) is in the {get_ordinal(ma_house)} house in <b>{ma_sign}</b>.")
+    points.append(f"<b>Asset Accumulation:</b> Mars triggers <b>{get_house_outcome(ma_house, type='pos' if ma_dignity != 'Debilitated' else 'neg', category='Property')}</b> in your property matters.")
 
     if ma_dignity == 'Debilitated':
         base_score -= 10
@@ -51,13 +51,13 @@ def analyze(birth_details, chart_data, dasa_info=None):
              p_sign = get_planet_sign(pos_str)
              p_house = calculate_house(p_sign, asc_sign)
              if p_house == house_num:
-                 nature = get_planet_nature(planet)
-                 outcome = get_house_outcome(house_num, type='pos' if planet in ['Mars', 'Venus', 'Jupiter'] else 'neg')
-                 points.append(f"<b>{area}:</b> {planet}'s presence brings **{nature}** here, triggering **{outcome}**.")
-                 if planet in ['Saturn', 'Rahu', 'Ketu']: base_score -= 10
-                 found = True
+                  nature = get_planet_nature(planet)
+                  outcome = get_house_outcome(house_num, type='pos' if planet in ['Mars', 'Venus', 'Jupiter'] else 'neg', category='Property')
+                  points.append(f"<b>{area}:</b> {planet}'s presence brings <b>{nature}</b> here, triggering <b>{outcome}</b>.")
+                  if planet in ['Saturn', 'Rahu', 'Ketu']: base_score -= 10
+                  found = True
         if not found:
-             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers **{get_house_outcome(house_num)}**.")
+             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers <b>{get_house_outcome(house_num, category='Property')}</b>.")
 
     # 4. Strengths & Challenges Summary
     challenges = []
@@ -73,25 +73,46 @@ def analyze(birth_details, chart_data, dasa_info=None):
             stability.append(planet)
 
     if challenges:
-        points.append(f"<b>Challenges:</b> **{', '.join(challenges)}** show some asset hurdles, requiring thorough verification of documents.")
+        points.append(f"<b>Challenges:</b> <b>{', '.join(challenges)}</b> show some asset hurdles, requiring thorough verification of documents.")
     if stability:
-        points.append(f"<b>Stability:</b> **{', '.join(stability)}** are well-placed, providing a favorable influence for domestic stability.")
+        points.append(f"<b>Stability:</b> <b>{', '.join(stability)}</b> are well-placed, providing a favorable influence for domestic stability.")
 
     # 5. Kendra Action Potential
     kendras = [p for p, pos in planetary_pos.items() if calculate_house(get_planet_sign(pos), asc_sign) in [1, 4, 7, 10] and p != 'Mandhi']
     if kendras:
-        points.append(f"<b>Active Influences:</b> **{', '.join(kendras)}** are in central houses, actively impacting your property decisions.")
+        points.append(f"<b>Active Influences:</b> <b>{', '.join(kendras)}</b> are in central houses, actively impacting your property decisions.")
 
     # 6. Strategic Advice
     advice = "Ensure all property documents are legally sound and focus on stable long-term investments."
     if base_score < 50:
         advice = "Defer major property purchases until more favorable planetary periods are active."
+    
+    # --- Dynamic Property Synthesis ---
+    from astro_predictor_app.app.utils.astro_utils import get_dynamic_recommendations
+    dynamic_insights = get_dynamic_recommendations(planetary_pos, asc_sign, 'Property')
+
+    points.append("<b>Top Recommended Property Asset Paths:</b>")
+    
+    lagna_recs = []
+    # Combine and limit
+    combined_recs = dynamic_insights + lagna_recs
+    final_recs = []
+    seen = set()
+    for r in combined_recs:
+        if r and r not in seen:
+            final_recs.append(r)
+            seen.add(r)
+            if len(final_recs) >= 5: break
+
+    for rec in final_recs:
+        points.append(f"• {rec}")
+
     points.append(f"<b>Strategic Recommendation:</b> {advice}")
 
     # Standardized Logic
-    points.extend(analyze_planetary_aspects(planetary_pos, asc_sign, target_houses))
-    points.extend(analyze_transits(transit_pos, asc_sign, target_houses))
-    points.extend(analyze_jamakkol(jamakkol_data, asc_sign, target_houses))
+    points.extend(analyze_planetary_aspects(planetary_pos, asc_sign, target_houses, category='Property'))
+    points.extend(analyze_transits(transit_pos, asc_sign, target_houses, category='Property'))
+    points.extend(analyze_jamakkol(jamakkol_data, asc_sign, target_houses, category='Property'))
     points.extend(analyze_dasa_bhukti_detailed(dasa_info, {}, category_name="House Property"))
 
     # Remedies Integration

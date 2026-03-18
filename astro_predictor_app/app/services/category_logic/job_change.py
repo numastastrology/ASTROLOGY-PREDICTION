@@ -20,15 +20,15 @@ def analyze(birth_details, chart_data, dasa_info=None):
     # 1. Foundation
     h10_sign = get_sign_name((get_sign_number(asc_sign) + 10 - 1) % 12 or 12)
     h10_lord = get_lord(h10_sign)
-    points.append(f"<b>Professional Change Foundation:</b> Your job change path is influenced by **{h10_sign}** energy, governed by **{h10_lord}**.")
+    points.append(f"<b>Professional Change Foundation:</b> Your job change path is influenced by <b>{h10_sign}</b> energy, governed by <b>{h10_lord}</b>.")
 
     # 2. Key Significator (Saturn for Job/Persistence)
     saturn_pos = planetary_pos.get('Saturn', '')
     s_sign = get_planet_sign(saturn_pos)
     s_house = calculate_house(s_sign, asc_sign)
     s_dignity = get_dignity('Saturn', s_sign)
-    points.append(f"<b>Primary Significator:</b> Saturn (planet of persistence) is in the {get_ordinal(s_house)} house in **{s_sign}**.")
-    points.append(f"<b>Workplace Flux:</b> Saturn triggers **{get_house_outcome(s_house, type='pos' if s_dignity != 'Debilitated' else 'neg')}** in your career trajectory.")
+    points.append(f"<b>Primary Significator:</b> Saturn (planet of persistence) is in the {get_ordinal(s_house)} house in <b>{s_sign}</b>.")
+    points.append(f"<b>Workplace Flux:</b> Saturn triggers <b>{get_house_outcome(s_house, type='pos' if s_dignity != 'Debilitated' else 'neg')}</b> in your career trajectory.")
 
     if s_dignity == 'Debilitated':
         base_score -= 10
@@ -53,11 +53,11 @@ def analyze(birth_details, chart_data, dasa_info=None):
              if p_house == house_num:
                  nature = get_planet_nature(planet)
                  outcome = get_house_outcome(house_num, type='pos' if planet in ['Sun', 'Jupiter', 'Mercury'] else 'neg')
-                 points.append(f"<b>{area}:</b> {planet}'s presence brings **{nature}** here, triggering **{outcome}**.")
+                 points.append(f"<b>{area}:</b> {planet}'s presence brings <b>{nature}</b> here, triggering <b>{outcome}</b>.")
                  if planet in ['Saturn', 'Mars', 'Rahu', 'Ketu']: base_score -= 10
                  found = True
         if not found:
-             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers **{get_house_outcome(house_num)}**.")
+             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers <b>{get_house_outcome(house_num)}</b>.")
 
     # 4. Strengths & Challenges Summary
     challenges = []
@@ -73,14 +73,14 @@ def analyze(birth_details, chart_data, dasa_info=None):
             stability.append(planet)
 
     if challenges:
-        points.append(f"<b>Challenges:</b> **{', '.join(challenges)}** show some hurdles in transition, requiring patience.")
+        points.append(f"<b>Challenges:</b> <b>{', '.join(challenges)}</b> show some hurdles in transition, requiring patience.")
     if stability:
-        points.append(f"<b>Stability:</b> **{', '.join(stability)}** are well-placed, providing a favorable influence during shifts.")
+        points.append(f"<b>Stability:</b> <b>{', '.join(stability)}</b> are well-placed, providing a favorable influence during shifts.")
 
     # 5. Kendra Action Potential
     kendras = [p for p, pos in planetary_pos.items() if calculate_house(get_planet_sign(pos), asc_sign) in [1, 4, 7, 10] and p != 'Mandhi']
     if kendras:
-        points.append(f"<b>Active Influences:</b> **{', '.join(kendras)}** are in central houses, actively driving your professional transitions.")
+        points.append(f"<b>Active Influences:</b> <b>{', '.join(kendras)}</b> are in central houses, actively driving your professional transitions.")
 
     # 6. Strategic Advice
     advice = "Thoroughly research new opportunities and ensure current commitments are met before transitioning."

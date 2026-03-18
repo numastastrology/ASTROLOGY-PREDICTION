@@ -20,15 +20,15 @@ def analyze(birth_details, chart_data, dasa_info=None):
     # 1. Foundation
     h7_sign = get_sign_name((get_sign_number(asc_sign) + 7 - 1) % 12 or 12)
     h7_lord = get_lord(h7_sign)
-    points.append(f"<b>Business Foundation:</b> Your entrepreneurial path is influenced by **{h7_sign}** energy, governed by **{h7_lord}**.")
+    points.append(f"<b>Business Foundation:</b> Your entrepreneurial path is influenced by <b>{h7_sign}</b> energy, governed by <b>{h7_lord}</b>.")
 
     # 2. Key Significator (Mercury for Trade/Commerce)
     mercury_pos = planetary_pos.get('Mercury', '')
     m_sign = get_planet_sign(mercury_pos)
     m_house = calculate_house(m_sign, asc_sign)
     m_dignity = get_dignity('Mercury', m_sign)
-    points.append(f"<b>Primary Significator:</b> Mercury (planet of trade) is in the {get_ordinal(m_house)} house in **{m_sign}**.")
-    points.append(f"<b>Commercial Instinct:</b> Mercury triggers **{get_house_outcome(m_house, type='pos' if m_dignity != 'Debilitated' else 'neg')}** in your business ventures.")
+    points.append(f"<b>Primary Significator:</b> Mercury (planet of trade) is in the {get_ordinal(m_house)} house in <b>{m_sign}</b>.")
+    points.append(f"<b>Commercial Instinct:</b> Mercury triggers <b>{get_house_outcome(m_house, type='pos' if m_dignity != 'Debilitated' else 'neg')}</b> in your business ventures.")
 
     if m_dignity == 'Debilitated':
         base_score -= 10
@@ -53,11 +53,11 @@ def analyze(birth_details, chart_data, dasa_info=None):
              if p_house == house_num:
                  nature = get_planet_nature(planet)
                  outcome = get_house_outcome(house_num, type='pos' if planet in ['Sun', 'Mercury', 'Jupiter'] else 'neg')
-                 points.append(f"<b>{area}:</b> {planet}'s presence brings **{nature}** here, triggering **{outcome}**.")
+                 points.append(f"<b>{area}:</b> {planet}'s presence brings <b>{nature}</b> here, triggering <b>{outcome}</b>.")
                  if planet in ['Saturn', 'Mars', 'Rahu', 'Ketu']: base_score -= 10
                  found = True
         if not found:
-             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers **{get_house_outcome(house_num)}**.")
+             points.append(f"<b>{area}:</b> The {get_ordinal(house_num)} house energy triggers <b>{get_house_outcome(house_num)}</b>.")
 
     # 4. Strengths & Challenges Summary
     challenges = []
@@ -73,14 +73,14 @@ def analyze(birth_details, chart_data, dasa_info=None):
             stability.append(planet)
 
     if challenges:
-        points.append(f"<b>Challenges:</b> **{', '.join(challenges)}** show some market hurdles, requiring cautious investment.")
+        points.append(f"<b>Challenges:</b> <b>{', '.join(challenges)}</b> show some market hurdles, requiring cautious investment.")
     if stability:
-        points.append(f"<b>Stability:</b> **{', '.join(stability)}** are well-placed, supporting steady growth and commercial success.")
+        points.append(f"<b>Stability:</b> <b>{', '.join(stability)}</b> are well-placed, supporting steady growth and commercial success.")
 
     # 5. Kendra Action Potential
     kendras = [p for p, pos in planetary_pos.items() if calculate_house(get_planet_sign(pos), asc_sign) in [1, 4, 7, 10] and p != 'Mandhi']
     if kendras:
-        points.append(f"<b>Active Influences:</b> **{', '.join(kendras)}** are in key pivot houses, making them active drivers of your business status.")
+        points.append(f"<b>Active Influences:</b> <b>{', '.join(kendras)}</b> are in key pivot houses, making them active drivers of your business status.")
 
     # 6. Strategic Advice
     advice = "Focus on market networking and maintain transparent communication with partners."
